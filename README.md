@@ -1,2 +1,1 @@
-# service-cms-es
-CMS 带 ES 查询版本
+cms项目独立的对外提供两个门户以及cms发布平台的服务

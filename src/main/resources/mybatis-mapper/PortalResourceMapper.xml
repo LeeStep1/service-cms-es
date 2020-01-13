@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bit.module.manager.dao.PortalResourceDao">
+
+	<!--新增角色-->
+	<insert id="addRoleSql" parameterType="com.bit.module.manager.bean.PortalRole" keyProperty="role.id" useGeneratedKeys="true" keyColumn="role.id">
+		INSERT INTO t_portal_role
+        	( role_name,role_describe, status)
+        VALUES
+            (
+				#{role.roleName},
+				#{role.roleDescribe},
+				#{role.status}
+            )
+	</insert>
+
+	<!--新增角色资源关系-->
+	<insert id="addRoleRelResourceSql">
+		INSERT INTO t_portal_role_rel_resource
+			( role_id,resource_id)
+		VALUES
+			<foreach collection="portalRoleRelResourceList" index="index" item="item" separator=",">
+			(
+				#{item.roleId,jdbcType=BIGINT},
+				#{item.resourceId,jdbcType=BIGINT}
+			)
+			</foreach>
+	</insert>
+
+	<!-- 修改角色 -->
+	<update id="modfiyRoleSql" parameterType="com.bit.module.manager.vo.PortalRoleVo">
+		UPDATE t_portal_role
+		<set>
+			<if test="portalRoleVo.roleName != null and portalRoleVo.roleName != ''">
+				role_name = #{portalRoleVo.roleName},
+			</if>
+			<if test="portalRoleVo.roleDescribe != null and portalRoleVo.roleDescribe != ''">
+				role_describe = #{portalRoleVo.roleDescribe},
+			</if>
+			<if test="portalRoleVo.status != null ">
+				status = #{portalRoleVo.status}
+			</if>
+		</set>
+		WHERE
+			id = #{portalRoleVo.id}
+	</update>
+
+	<!-- 根据ID删除角色资源对应关系 -->
+	<delete id="deleteRoleRelResourceSql" parameterType="java.lang.Long">
+		DELETE
+		FROM
+			t_portal_role_rel_resource
+		WHERE
+			role_id = #{roleId}
+	</delete>
+
+	<!-- 删除角色 -->
+	<delete id="deleteRoleSql" parameterType="java.lang.Long">
+		DELETE
+		FROM
+			t_portal_role
+		WHERE
+			id = #{roleId}
+	</delete>
+
+	<!--获取所有资源-->
+	<select id="findResourceSql" parameterType="java.lang.Integer"
+			resultType="com.bit.module.manager.bean.PortalResource">
+		SELECT
+			t.id,
+			t.name,
+			t.url,
+			t.pid,
+			t.icon,
+			t.ext_field extField
+		FROM
+			t_portal_resource t
+		WHERE
+			t.display = #{status}
+	</select>
+
+	<!-- 查询角色列表 -->
+    <select id="findRoleListPageSql" parameterType="com.bit.module.manager.vo.PortalRoleVo"
+			resultType="com.bit.module.manager.bean.PortalRole">
+		SELECT
+			t.id,
+			t.role_name roleName,
+			t.role_describe roleDescribe
+		FROM
+			t_portal_role t
+		WHERE
+			t.status = #{portalRoleVo.status}
+		<if test="portalRoleVo.roleName != null and portalRoleVo.roleName !=''">
+			and t.role_name like CONCAT('%',#{portalRoleVo.roleName},'%')
+		</if>
+
+	</select>
+
+	<!-- 检查角色是否可以删除 -->
+	<select id="checkDeleteSql" parameterType="java.lang.Long"
+			resultType="java.lang.Integer">
+		SELECT
+			COUNT(t.id)
+		FROM
+			t_portal_role_rel_user t
+		WHERE
+			t.role_id = #{roleId}
+	</select>
+
+	<!-- 根据ID查询角色明细 -->
+	<select id="findRoleSql" parameterType="java.lang.Long"
+			resultType="com.bit.module.manager.vo.PortalRoleVo">
+		SELECT
+			t.id,
+			t.role_name roleName,
+			t.role_describe roleDescribe
+		FROM
+			t_portal_role t
+		WHERE
+			t.id = #{roleId}
+	</select>
+
+	<!-- 根据角色ID 查询角色资源 -->
+	<select id="findRoleRelRoleByRoleIdSql"  parameterType="java.lang.Long"
+			resultType="java.lang.Long">
+		SELECT
+			t.resource_id resourceId
+		FROM
+			t_portal_role_rel_resource t
+		WHERE
+			t.role_id = #{roleId}
+
+	</select>
+
+	<!-- 查询角色所含资源明细 -->
+	<select id="findRoleResourceDetailSql" parameterType="java.lang.Long"
+			resultType="com.bit.module.manager.bean.PortalResource">
+		select
+			tpr.id ,
+			tpr.name,
+			tpr.pid,
+			tpr.url,
+			tpr.icon,
+			tpr.ext_field extField
+		FROM
+		t_portal_role_rel_resource tprr,
+		t_portal_resource tpr
+		WHERE
+			tprr.resource_id = tpr.id
+		and tprr.role_id = #{roleId}
+	</select>
+</mapper>

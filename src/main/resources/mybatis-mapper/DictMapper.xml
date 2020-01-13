@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bit.module.manager.dao.DictDao">
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="Dict_columns">
+	    <![CDATA[
+			id as id,
+			module as module,
+			dict_code as dict_code,
+			dict_name as dict_name,
+			sort as sort,
+			remark as remark
+	    ]]>
+	</sql>
+
+	<!-- 字段与属性映射 -->
+	<resultMap type="com.bit.module.manager.bean.Dict" id="dictMap">
+		<id column="id" property="id"/>
+	    <result column="module" property="module"/>
+	    <result column="dict_code" property="dictCode"/>
+	    <result column="dict_name" property="dictName"/>
+	    <result column="sort" property="sort"/>
+	    <result column="remark" property="remark"/>
+	</resultMap>
+
+
+
+	<!-- 查询单条记录 -->
+	<select id="findById" resultMap="dictMap" parameterType="com.bit.module.manager.bean.Dict">
+		select <include refid="Dict_columns" />  from t_sys_dict where id =#{id,jdbcType=BIGINT}
+	</select>
+
+	<!-- 根据模块查询字典 -->
+    <select id="findByModule" resultType="com.bit.module.manager.bean.Dict" parameterType="string">
+		select <include refid="Dict_columns" />
+		from t_sys_dict
+		where module =#{module,jdbcType=VARCHAR}
+		ORDER by sort
+	</select>
+
+	<!-- 添加一条记录 -->
+	<insert id="add" parameterType="com.bit.module.manager.bean.Dict">
+		insert INTO t_sys_dict (
+			module ,
+			dict_code ,
+			dict_name ,
+			sort,
+			remark
+		) VALUES (
+			#{module,jdbcType=VARCHAR},
+			#{dictCode,jdbcType=VARCHAR},
+			#{dictName,jdbcType=VARCHAR},
+			#{sort,jdbcType=INTEGER},
+			#{remark,jdbcType=VARCHAR}
+		)
+	</insert>
+
+	<!-- 修改一条记录 -->
+	<update id="update" parameterType="com.bit.module.manager.bean.Dict">
+		update t_sys_dict
+		<set>
+		<if test="module != null">
+		 module =#{module,jdbcType=VARCHAR},
+		</if>
+		<if test="dictCode != null">
+		 dict_code =#{dictCode,jdbcType=VARCHAR},
+		</if>
+		<if test="dictName != null">
+		dict_name =#{dictName,jdbcType=VARCHAR},
+		</if>
+		<if test="sort != null">
+		 sort =#{sort,jdbcType=INTEGER},
+		</if>
+		<if test="remark != null">
+			remark =#{remark,jdbcType=INTEGER}
+		</if>
+		</set>
+		where   id = #{id,jdbcType=BIGINT}
+	</update>
+
+	<!-- 删除一条记录 -->
+	<delete id="delete" parameterType="com.bit.module.manager.bean.Dict">
+		delete from t_sys_dict  where id = #{id,jdbcType=BIGINT}
+	</delete>
+
+	<select id="findByModuleAndDictCode" parameterType="com.bit.module.manager.bean.Dict" resultMap="dictMap">
+		select <include refid="Dict_columns" />
+		from t_sys_dict
+		<where>
+			<if test="module!=null">and module = #{module,jdbcType=VARCHAR}</if>
+			<if test="dictCode!=null">and dict_code = #{dictCode,jdbcType=VARCHAR}</if>
+		</where>
+	</select>
+
+	
+	<select id="findByModules" resultMap="dictMap" parameterType="com.bit.module.manager.bean.Dict">
+		select <include refid="Dict_columns" />
+		from t_sys_dict
+		<where>
+			<if test="modules!=null and modules.size()>0">
+				and module in
+				<foreach collection="modules" item="module" index="index" open="(" close=")" separator=",">
+					#{module,jdbcType=VARCHAR}
+				</foreach>
+			</if>
+		</where>
+	</select>
+</mapper>

@@ -1,0 +1,105 @@
+
+server:
+  port: 8088
+  servlet:
+    context-path: /cms
+
+spring:
+  jackson:
+    serialization:
+      write-dates-as-timestamps: true
+    defaultPropertyInclusion: always
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/wt_cms?characterEncoding=utf-8
+    username: root
+    #使用远程的配置中心的参数
+    password: root
+    # 使用druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    filters: stat
+    maxActive: 20
+    initialSize: 1
+    maxWait: 60000
+    minIdle: 1
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: select 'x'
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+    maxOpenPreparedStatements: 20
+  data:
+    mongodb:
+      uri: mongodb://tester:1qaz2wsx@101.201.235.239:27017/test
+    elasticsearch:
+      repositories:
+        enabled: true
+      cluster-name: Lee
+      cluster-nodes: 127.0.0.1:9300
+  servlet:
+    multipart:
+      maxRequestSize: 200MB
+      maxFileSize: 200MB
+
+redis:
+   hostName: 101.201.235.239
+   port: 6379
+   timeout: 30
+   maxIdle : 300
+   maxTotal: 1000
+   maxWaitMillis: 1000
+   minEvictableIdleTimeMillis : 300000
+   numTestsPerEvictionRun : 1024
+   timeBetweenEvictionRunsMillis : 30000
+   testOnBorrow : true
+   testWhileIdle : true
+mybatis:
+  mapper-locations: classpath:mybatis-mapper/*.xml
+  config-location:  classpath:mybatis-config.xml
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: countSql
+logging:
+  level:
+     com.bit.module.manager.dao : debug
+     com.bit.module.website.dao : debug
+
+#atToken过期时间
+atToken:
+  expire: 86400
+
+#rtToken过期时间
+rtToken:
+  expire: 604800
+fastdfs:
+  address: http://101.201.235.239:8888
+  maxFileSize: 20MB
+  maxRequestSize: 20MB
+connect_timeout : 60
+
+# socket连接超时时长
+network_timeout: 120
+# 文件内容编码
+charset: UTF-8
+# tracker服务器端口
+tracker_http_port: 8888
+
+anti_steal_token: false
+
+secret_key: 123456
+# tracker服务器IP和端口（可以写多个）
+tracker_server: 101.201.235.239:22122
+
+video:
+  path: D://video
+
+account:
+  token: token
+
+noFilterUrl: cms/pageDisplay/,cms/specialPageDisplay/,cms/manager/user/login,cms/manager/user/getCode
+
+expireTime: 300
